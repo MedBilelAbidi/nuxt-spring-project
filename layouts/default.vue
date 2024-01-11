@@ -22,7 +22,7 @@
               </div>
             </div>
           </header>
-        <main class="container">
+        <main class="container pt-5 mt-80">
 
             <NuxtPage></NuxtPage>
 

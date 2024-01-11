@@ -2,10 +2,11 @@
     <div>
 
         <template>
-                <Sidebar :modal="false" v-model:visible="visible">
+                <Sidebar class="glosy-bg" :modal="false" :dismissable="false" v-model:visible="visible">
 
                 </Sidebar>
-                
+                <Button icon="pi pi-plus" @click="visible = true" />
+
         </template>
         
     </div>
