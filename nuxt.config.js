@@ -17,6 +17,9 @@ export default defineNuxtConfig({
     },
     components: {
       include: '*'
-    }
+    },
+    directives: {
+      include: '*'
+  }
   }
 });
