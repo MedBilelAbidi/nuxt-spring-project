@@ -2,13 +2,15 @@
     <div>
         <header class="p-3  nav-bar-app">
             <div class="container">
-              <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+              <div class="d-flex flex-wrap align-items-center justify-content-between">
 
         
-                <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+                <ul class="nav  col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
                   <li><nuxt-link to="/" class="nav-link px-2 text-white">Home</nuxt-link></li>
                   <li><nuxt-link  to="/shope" class="nav-link px-2 text-white">Shope</nuxt-link></li>
-                  <li><nuxt-link  to="#" class="nav-link px-2 text-white">Pricing</nuxt-link></li>
+                  <li><nuxt-link  to="/clients" class="nav-link px-2 text-white">Clients</nuxt-link></li>
+                  <li><nuxt-link  to="/factures" class="nav-link px-2 text-white">Factures</nuxt-link></li>
+
                   <li><nuxt-link  to="#" class="nav-link px-2 text-white">FAQs</nuxt-link></li>
                   <li><nuxt-link  to="#" class="nav-link px-2 text-white">About</nuxt-link></li>
                 </ul>
@@ -22,7 +24,7 @@
               </div>
             </div>
           </header>
-        <main class="container pt-5 mt-80">
+        <main class="container pb-5 mt-80">
 
             <NuxtPage></NuxtPage>
 
