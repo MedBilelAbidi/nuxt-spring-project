@@ -29,6 +29,7 @@ export default defineNuxtConfig({
     public: {
       productBaseUrl: 'http://localhost:8888/PRODUIT-SERVICE/produits',
       clientBaseUrl: 'http://localhost:8888/CLIENT-SERVICE/clients',
+      factureBaseUrl: 'http://localhost:8888/FACTURE-SERVICE/full-facture'
     },
     
   },

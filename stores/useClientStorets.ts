@@ -52,16 +52,15 @@ export const useClientStorets = defineStore("clientStorets", {
     const runTimeConfig = useRuntimeConfig();
 
     try {
-      const response = await $fetch<SpringApi<"clients", ClientsList>>(
+      const response = await $fetch<ClientsList>(
         "/",
         {
           method: "GET",
           baseURL: runTimeConfig.public.clientBaseUrl,
         }
       );
-        console.log(response._embedded.clients);
         
-      this.clientList = response._embedded.clients
+      this.clientList = response
 
 
     } catch (error) {
@@ -72,7 +71,7 @@ export const useClientStorets = defineStore("clientStorets", {
     const runTimeConfig = useRuntimeConfig();
 
     try {
-      const response = await $fetch<SpringApi<"produits", ClientsList>>(
+      const response = await $fetch(
         "/",
         {
           method: "POST",

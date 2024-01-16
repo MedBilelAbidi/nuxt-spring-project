@@ -63,7 +63,6 @@ export const useProductStore = defineStore("productStore", {
           baseURL: runTimeConfig.public.productBaseUrl,
         }
       );
-        console.log(response._embedded.produits);
         
       this.productList = response._embedded.produits
 
@@ -76,7 +75,7 @@ export const useProductStore = defineStore("productStore", {
     const runTimeConfig = useRuntimeConfig();
 
     try {
-      const response = await $fetch<SpringApi<"produits", ProductsList>>(
+      const response = await $fetch<ProductsList>(
         "/",
         {
           method: "POST",

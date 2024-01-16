@@ -1,7 +1,7 @@
 
 
 
-export interface Client {
+export interface Facture {
     id : number,
     name : string,
     email: string
@@ -20,91 +20,91 @@ type SpringApi<K extends string | number | symbol, T> = {
     _links: any
 }
 
-export type ClientsList = Client[];
+export type FacturesList = Facture[];
 
-interface ClientState {
-  clientList: ClientsList;
-  clientPending: {
-        clientsList: boolean
+interface FactureState {
+  factureList: FacturesList;
+  facturePending: {
+        facturesList: boolean
     }
 }
 
-const state = (): ClientState => ({
-  clientList: [],
-  clientPending:{
-      clientsList: false
+const state = (): FactureState => ({
+  factureList: [],
+  facturePending:{
+      facturesList: false
     }
 });
 
 const getters = {
-  getClientList: (state: ClientState) => {
-   return state.clientList
+  getFactureList: (state: FactureState) => {
+   return state.factureList
   }
 };
 
-export const useClientStorets = defineStore("clientStorets", {
+export const useFacturesStorets = defineStore("factureStorets", {
   state,
   getters,
   actions: {
 
    
-   async  fetchClient() {
+   async  fetchFacture() {
     const runTimeConfig = useRuntimeConfig();
 
     try {
-      const response = await $fetch<SpringApi<"clients", ClientsList>>(
+      const response = await $fetch<FacturesList>(
         "/",
         {
           method: "GET",
-          baseURL: runTimeConfig.public.clientBaseUrl,
+          baseURL: runTimeConfig.public.factureBaseUrl,
         }
       );
-        console.log(response._embedded.clients);
+        console.log(response);
         
-      this.clientList = response._embedded.clients
+      this.factureList = response
 
 
     } catch (error) {
     throw new Error(String(error))
     }
    },
-   async  saveClient(client: Client) {
-    const runTimeConfig = useRuntimeConfig();
-
-    try {
-      const response = await $fetch<SpringApi<"produits", ClientsList>>(
-        "/",
-        {
-          method: "POST",
-          body : toRaw(client),
-          baseURL: runTimeConfig.public.clientBaseUrl,
-        }
-      );
-        this.fetchClient()
-
-    } catch (error) {
-    throw new Error(String(error))
-    }
-   },
-   async  editClient(client: Client) {
+   async  saveFacture(facture: Facture) {
     const runTimeConfig = useRuntimeConfig();
 
     try {
       const response = await $fetch(
-        `/${client.id}`,
+        "/",
         {
-          method: "PUT",
-          body : toRaw(client),
-          baseURL: runTimeConfig.public.clientBaseUrl,
+          method: "POST",
+          body : toRaw(facture),
+          baseURL: runTimeConfig.public.factureBaseUrl,
         }
       );
-        this.fetchClient()
+        this.fetchFacture()
 
     } catch (error) {
     throw new Error(String(error))
     }
    },
-   async  deleteClient(id: string) {
+   async  editFacture(facture: Facture) {
+    const runTimeConfig = useRuntimeConfig();
+
+    try {
+      const response = await $fetch(
+        `/${facture.id}`,
+        {
+          method: "PUT",
+          body : toRaw(facture),
+          baseURL: runTimeConfig.public.factureBaseUrl,
+        }
+      );
+        this.fetchFacture()
+
+    } catch (error) {
+    throw new Error(String(error))
+    }
+   },
+   async  deleteFacture(id: string) {
     const runTimeConfig = useRuntimeConfig();
 
     try {
@@ -112,10 +112,10 @@ export const useClientStorets = defineStore("clientStorets", {
         `/${id}`,
         {
           method: "DELETE",
-          baseURL: runTimeConfig.public.clientBaseUrl,
+          baseURL: runTimeConfig.public.factureBaseUrl,
         }
       );
-        this.fetchClient()
+        this.fetchFacture()
 
     } catch (error) {
     throw new Error(String(error))

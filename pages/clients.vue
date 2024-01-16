@@ -8,12 +8,17 @@
     </div>
     <div class="card">
 
-        <DataTable :value="clientStore.getClientList" paginator :rows="5" 
+        <DataTable  ref="dt" :sortOrder="1" sortField="id" :value="clientStore.getClientList" paginator :rows="5" 
         @row-click="collectData($event)"  tableStyle="min-width: 50rem">
-            <Column field="id" header="Id" style="width: 10%"></Column>
-            <Column field="name" header="Name" style="width: 45%"></Column>
-            <Column field="email" header="Email" style="width: 45%"></Column>
-            <Column header="Actions" style="width: 45%">
+        <template #header>
+            <div style="text-align: left">
+                <Button icon="pi pi-external-link" label="Export" @click="exportCSV($event)" />
+            </div>
+        </template>
+            <Column field="id" header="Id" sortable  style="width: 10%"></Column>
+            <Column field="name" header="Name" sortable  style="width: 45%"></Column>
+            <Column field="email" header="Email" sortable  style="width: 45%"></Column>
+            <Column header="Actions"   style="width: 45%">
                 <template #body="slotProps">
                     <div class="flex gap-2">
                         <Button icon="pi pi-trash
@@ -123,6 +128,11 @@ const confirm1 = () => {
         },
     
     });
+};
+const dt = ref();
+
+const exportCSV = () => {
+    dt.value.exportCSV();
 };
 onBeforeMount(async()=>{
     await clientStore.fetchClient()
