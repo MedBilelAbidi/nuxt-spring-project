@@ -71,6 +71,26 @@ export const useProductStore = defineStore("productStore", {
     throw new Error(String(error))
     }
    },
+   async  fetchProductSorted(sortOrder : string = 'asc') {
+    const runTimeConfig = useRuntimeConfig();
+
+    try {
+      const response = await $fetch<SpringApi<"produits", ProductsList>>(
+        `/sorted-by-price?order=${sortOrder}`,
+        {
+          method: "GET",
+          baseURL: runTimeConfig.public.productBaseUrl,
+        }
+      );
+        
+      this.productList = response
+
+
+    } catch (error) {
+    throw new Error(String(error))
+    }
+   },
+
    async  saveProducts(product: Product) {
     const runTimeConfig = useRuntimeConfig();
 

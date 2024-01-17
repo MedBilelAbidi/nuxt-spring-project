@@ -10,6 +10,9 @@
 
         <DataTable v-model:expandedRows="expandedRows" :value="factureStore.getFactureList" dataKey="id"
         tableStyle="min-width: 60rem">
+        <template #empty>
+            No Facture Found
+        </template>
     <Column expander style="width: 5rem" />
     <Column field="id" header="ID"></Column>
     <Column field="clientID" header="Client ID"></Column>
@@ -30,7 +33,7 @@
             <Button icon="pi pi-pencil" @click="addFactureVisible = true,collectEditData(slotProps.data)" rounded ></Button>
 
             <Button icon="pi pi-trash
-            " @click="confirm1()" severity="danger" rounded ></Button>
+            " @click="confirm1(slotProps.data.id)" severity="danger" rounded ></Button>
                 </template>
     </Column>
     <template #expansion="slotProps">
@@ -55,7 +58,7 @@
                 </Column>
                 <Column field="quantity" header="Qunatity" sortable>
                 </Column>
-                <Column headerStyle="width:4rem" >
+                <Column headerStyle="width:4rem" header="Action">
                     <template #body="slotProps">
                         <Button @click="collectData(slotProps.data)" icon="pi pi-search" />
                     </template>
@@ -93,40 +96,68 @@
         :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <div class="flex flex-column gap-3">
                 <label class="d-block">
-                   Client Name
+                   Client Name {{ numbOfProducts }}
                 </label>
-                <Dropdown v-model="userInputs.client" :options="clientStore.getClientList" filter optionLabel="name" placeholder="Select a client" class="w-full" />
-                <div class="d-flex justify-content-between align-items-end ">
-                    <h4>
-                        Add Products
-                    </h4>
-                    <Button @click="addProductObject"  icon="pi pi-plus" severity="primary"  />
+                <Dropdown v-model="userInputs.clientID" 
+                :options="clientStore.getClientList" 
+               
+                filter optionLabel="name" 
+                option-value="id"
+                placeholder="Select a client" class="w-full" />
+
+                <div v-if="userInputs.clientID">
+                    <div class="d-flex justify-content-between align-items-end mb-3">
+                        <h4>
+                            Add Products
+                        </h4>
+                        <Button @click="addProductObject"  icon="pi pi-plus" severity="primary"  />
+                    </div>
+                    <div v-for="itemsCount in numbOfProducts" class="mb-4 pb-4 border-bottom">
+                        <div class="d-flex justify-content-between  align-items-end mb-2">
+                            <span>
+                                Product N°{{ itemsCount }} Details 
+                            </span>
+                            <span>
+                                <Button @click="deleteProductObject(itemsCount-1)"  icon="pi pi-times" severity="danger" text rounded  />
+
+                            </span>
+                         </div>
+                         <Dropdown v-model="userInputs.facturekignes[itemsCount-1].produitID" 
+                         @change="(e)=> onProductSelect(itemsCount-1, e)" 
+                         :options="productStore.getProductsList" filter class="w-100"
+                          optionLabel="name" option-value="id" placeholder="Select a product" />
+                         <div class="row" v-if="userInputs.facturekignes[itemsCount-1].produitID">
+                            <div class="col-6">
+                                <label class="d-block">
+                                    Product Quantity
+                                 </label>
+                                <InputNumber v-model="userInputs.facturekignes[itemsCount-1].quantity" @update:modelValue="calcProductPrice(itemsCount-1)" 
+                                inputId="integeronly" class="w-100"/>
+                            </div>
+                            <div class="col-6">
+                                <label class="d-block">
+                                    Product Price
+                                 </label>
+                                <InputNumber v-model="userInputs.facturekignes[itemsCount-1].price" inputId="integeronly" class="w-100" disabled=""/>
+                            </div>
+                         </div>
+                      </div>
                 </div>
-              <div v-for="itemsCount in numbOfProducts">
-                <label class="d-block">
-                    Product Details
-                 </label>
-                 <Dropdown v-model="userInputs.facturekignes[itemsCount-1].produit" @change="onProductSelect(itemsCount-1)" :options="productStore.getProductsList" filter optionLabel="name" placeholder="Select a product" class="w-full" />
-                 <div class="row">
-                    <div class="col-6">
-                        <label class="d-block">
-                            Product Quantity
-                         </label>
-                        <InputNumber v-model="userInputs.facturekignes[itemsCount-1].quantity" @change="calcProductPrice" inputId="integeronly" class="w-100"/>
-                    </div>
-                    <div class="col-6">
-                        <label class="d-block">
-                            Product Price
-                         </label>
-                        <InputNumber v-model="userInputs.facturekignes[itemsCount-1].price" inputId="integeronly" class="w-100" disabled=""/>
-                    </div>
-                 </div>
-              </div>
 
             </div>
             <template #footer>
-                <Button @click="addFactureVisible = false" label="Cancel" icon="pi pi-times" severity="secondary"  />
-                <Button @click="handelProduct" :label="uiMutateItems.button" icon="pi pi-check" class="ms-3" />
+                <div class="d-flex justify-content-between align-items-end">
+                    <div>
+                        <label class="h6 d-block" >Total Price:</label>
+                        <InputNumber v-model="userInputs.price" inputId="integeronly"  disabled=""/>
+                    </div>
+                    <div>
+                        <Button @click="addFactureVisible = false" label="Cancel" icon="pi pi-times" severity="secondary"  />
+                        <Button @click="handelFacture" :label="uiMutateItems.button" icon="pi pi-check" class="ms-3" />
+                    </div>
+                </div>
+
+
 
             </template>
         </Dialog>
@@ -158,7 +189,9 @@ const userInputs = reactive({
         price: undefined,
         produit: {}
     }],
-    clinet : {}
+    client : {},
+    clientID: undefined,
+    price: undefined
 })
 const expandedRows = ref([]);
 const detailsVisible = ref(false)
@@ -174,36 +207,68 @@ const collectData = (item) =>{
 const collectEditData = (item) =>{
     uiMutateItems.button = 'Save Updates'
     uiMutateItems.title = 'Edit Factures'
-
-    console.log(item);
     selectedItem.value = item
+    numbOfProducts.value =  selectedItem.value.facturekignes.length 
     for (const key in selectedItem.value) {
          userInputs[key] = selectedItem.value[key]
     }
 }
-const onProductSelect = () =>{
+const onProductSelect = (index, e) =>{
+    userInputs.facturekignes[index].produit =  productStore.getProductsList.find(item => item.id === userInputs.clientID);
 
+    userInputs.facturekignes[index].price = userInputs.facturekignes[index].produit.price
+    userInputs.facturekignes[index].quantity = 1
+    let totalPrice = 0
+    for (let index = 0; index < userInputs.facturekignes.length; index++) {
+        const element = userInputs.facturekignes[index];
+        totalPrice = totalPrice + element.price
+    }
+    userInputs.price = totalPrice
 }
-const calcProductPrice = () =>{
+const calcProductPrice = (index) =>{
+    if (!userInputs.facturekignes[index].quantity) {
+        return
+    }
+    userInputs.facturekignes[index].price =  userInputs.facturekignes[index].produit.price * userInputs.facturekignes[index].quantity
 
+    let totalPrice = 0
+    for (let index = 0; index < userInputs.facturekignes.length; index++) {
+        const element = userInputs.facturekignes[index];
+        totalPrice = totalPrice + element.price
+    }
+    userInputs.price = totalPrice
 }
+
 const addProductObject = () =>{
     numbOfProducts.value++ 
     userInputs.facturekignes.push({
         produitID : '',
-        quantity: 0,
-        price: 0,
+        quantity: undefined,
+        price: undefined,
         produit: {}
     })
+}
+const deleteProductObject = (index) =>{
+    console.log('deleteProductObject');
+    numbOfProducts.value -= 1
+    userInputs.facturekignes.splice(index, 1)
 }
 const resetForm = () =>{
     for (const key in userInputs) {
          userInputs[key] = undefined
+         
     }
+    userInputs.facturekignes = [{
+        produitID : '',
+        quantity: undefined,
+        price: undefined,
+        produit: {}
+    }]
+    numbOfProducts.value = 1
     uiMutateItems.button = 'Add New Facture'
     uiMutateItems.title = 'Save Facture'
 }
-const handelProduct = async () =>{
+const handelFacture = async () =>{
     if ( userInputs.id) {
        try {
          await  factureStore.editFacture(userInputs)
@@ -228,7 +293,7 @@ const handelProduct = async () =>{
     }
 }
 
-const confirm1 = () => {
+const confirm1 = (id) => {
     confirm.require({
         message: 'Are you sure you want to delete?',
         header: 'Confirmation',
@@ -237,7 +302,7 @@ const confirm1 = () => {
         acceptClass: 'p-button-danger p-button-text',
         accept: () => {
             toast.add({ severity: 'info', summary: 'Confirmed', detail: 'You have accepted', life: 3000 });
-            factureStore.deleteFacture(selectedItem.value.id)
+            factureStore.deleteFacture(id)
             addFactureVisible.value = false
 
         },

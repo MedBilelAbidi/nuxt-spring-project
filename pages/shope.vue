@@ -5,7 +5,8 @@
             <template #header>
                 <div class="flex justify-content-between">
                     <div>
-                        <Dropdown v-model="sortKey" :options="sortOptions" optionLabel="label" placeholder="Sort By Price" @change="onSortChange($event)" />
+                        <Dropdown v-model="sortKey" option-value="value" :options="sortOptions" optionLabel="label" 
+                        placeholder="Sort By Price" @change="onSortChange($event)" /> 
                         <Button @click="addProductVisible = true" label="Add new Product" icon="pi pi-plus" class="ms-3" />
 
                     </div>
@@ -143,6 +144,9 @@
                         <span class="pi pi-minus" />
                     </template>
                 </InputNumber>
+                <div class="flex flex-column align-items-center gap-3 py-5">
+                    <img class="w-9 h-9 shadow-2 border-round" :src="userInputs.imageUrl"  />
+                </div>
                 <label class="d-block">
                     Product Image URL
                 </label>
@@ -182,8 +186,8 @@ const layout = ref('grid');
 const selectedItem = ref({})
 const userInputs = reactive({})
 const sortOptions = ref([
-    {label: 'Price High to Low', value: '!price'},
-    {label: 'Price Low to High', value: 'price'},
+    {label: 'Price High to Low', value: '"asc"'},
+    {label: 'Price Low to High', value: 'desc'},
 ]);
 const collectData = (item) =>{
     selectedItem.value = item
@@ -243,6 +247,16 @@ const confirm1 = () => {
     
     });
 };
+const onSortChange = (event) =>{
+    console.log(event);
+   if (sortKey.value === 'desc') {
+    productStore.fetchProductSorted(sortKey.value)
+   } 
+   else {
+    productStore.fetchProductSorted()
+
+   }
+} 
 const getSeverity = (product) => {
     switch (product) {
         case 'INSTOCK':
