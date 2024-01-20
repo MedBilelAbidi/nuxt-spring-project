@@ -40,7 +40,7 @@
 
                                         <Button icon="pi pi-search" @click="collectData(item),detailsVisible = true" rounded ></Button>
                                         <Button icon="pi pi-trash
-                                        " @click="confirm1()" severity="danger" rounded ></Button>
+                                        " @click="confirm1(item.id)" severity="danger" rounded ></Button>
                                     </div>
 
                                 </div>
@@ -60,7 +60,7 @@
                                     <span class="font-semibold">{{ item.quantity }}</span>
                                 </span>
                                 <Tag :value="getStockState(item.quantity)" :severity="getSeverity(getStockState(item.quantity))"></Tag>
-                                <Button icon="pi pi-trash" @click="confirm1()" severity="danger" rounded ></Button>
+                                <Button icon="pi pi-trash" @click="confirm1(item.id)" severity="danger" rounded ></Button>
                             </div>
                             <div class="flex flex-column align-items-center gap-3 py-5">
                                 <img class="w-9 shadow-2 border-round" :src="item.imageUrl" :alt="item.name" />
@@ -98,9 +98,9 @@
                     </div>
                     <div class="flex align-items-center justify-content-between">
                         <Button icon="pi pi-trash
-                        " @click="confirm1()" severity="danger" rounded ></Button>
+                        " @click="confirm1(selectedItem.id)" severity="danger" rounded ></Button>
                         <span class="text-2xl font-semibold">${{ selectedItem.price }}</span>
-                        <Button icon="pi pi-pencil" rounded ></Button>
+                        <Button icon="pi pi-pencil" @click="addProductVisible = true,collectEditData(selectedItem)" rounded ></Button>
                     </div>
                 </div>
        
@@ -186,8 +186,8 @@ const layout = ref('grid');
 const selectedItem = ref({})
 const userInputs = reactive({})
 const sortOptions = ref([
-    {label: 'Price High to Low', value: '"asc"'},
-    {label: 'Price Low to High', value: 'desc'},
+    {label:'Price Low to High' , value: '"asc"'},
+    {label:  'Price High to Low', value: 'desc'},
 ]);
 const collectData = (item) =>{
     selectedItem.value = item
@@ -231,7 +231,7 @@ const resetForm = () =>{
     uiMutateItems.button = 'Add New Product'
     uiMutateItems.title = 'Save new Product'
 }
-const confirm1 = () => {
+const confirm1 = (id) => {
     confirm.require({
         message: 'Are you sure you want to delete?',
         header: 'Confirmation',
@@ -240,7 +240,7 @@ const confirm1 = () => {
         acceptClass: 'p-button-danger p-button-text',
         accept: () => {
             toast.add({ severity: 'info', summary: 'Confirmed', detail: 'You have accepted', life: 3000 });
-            productStore.deleteProducts(selectedItem.value.id)
+            productStore.deleteProducts(id)
             addProductVisible.value = false
 
         },
@@ -284,6 +284,12 @@ const getStockState = (quantity) => {
 
 onBeforeMount(async()=>{
     await productStore.fetchProducts()
-})
+});
 
 </script>
+<style>
+img{
+    max-height: 100px;
+    object-fit: contain;
+}
+</style>
